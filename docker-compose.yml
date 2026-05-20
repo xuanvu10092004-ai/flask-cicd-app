@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+  flask-app:
+    # Thay 'yourdockerhub' bằng Docker Hub username của bạn
+    image: nguyenxuanvu10092004/flask-cicd-app:latest
+
+    container_name: flask-app
+
+    # Tự động restart nếu container bị crash
+    restart: always
+
+    ports:
+      # Map port 80 máy chủ → port 5000 trong container
+      - "80:5000"
