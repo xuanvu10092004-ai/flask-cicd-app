@@ -47,18 +47,18 @@ jobs:
       - name: Login Docker Hub
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
+          username: ${{ secrets.DOCKER_USERNAME1 }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       # Bước 6: Build Docker image và đặt tag
       - name: Build Docker image
         run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/flask-cicd-app:latest .
+          docker build -t ${{ secrets.DOCKER_USERNAME1 }}/flask-cicd-app:latest .
 
       # Bước 7: Push image lên Docker Hub Registry
       - name: Push Docker image
         run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/flask-cicd-app:latest
+          docker push ${{ secrets.DOCKER_USERNAME1 }}/flask-cicd-app:latest
 
   # --------------------------------------------------
   # JOB 2: Deploy lên server (TẠM THỜI TẮT - chưa có VPS)
