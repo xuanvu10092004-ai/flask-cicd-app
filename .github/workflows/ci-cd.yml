@@ -1,83 +1,37 @@
-# Tên workflow hiển thị trên GitHub Actions
 name: Flask CI/CD Pipeline
 
-# ===== TRIGGER =====
-# Workflow chạy khi có push lên branch main
 on:
   push:
     branches:
       - main
 
-# ===== JOBS =====
 jobs:
-
-  # --------------------------------------------------
-  # JOB 1: Chạy test + Build + Push Docker image
-  # --------------------------------------------------
   test-build:
-
-    # Sử dụng Ubuntu VM do GitHub cung cấp miễn phí
     runs-on: ubuntu-latest
 
     steps:
-
-      # Bước 1: Lấy source code từ repository về runner
       - name: Checkout source
         uses: actions/checkout@v4
 
-      # Bước 2: Cài Python 3.11
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      # Bước 3: Cài Flask và pytest từ requirements.txt
       - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
+        run: pip install -r requirements.txt
 
-      # Bước 4: Chạy unit test
-      # Nếu test FAIL → pipeline dừng, không deploy
       - name: Run tests
-        run: |
-          pytest
+        run: pytest
 
-      # Bước 5: Đăng nhập Docker Hub
-      # Dùng secrets để bảo mật (không lộ password)
       - name: Login Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME1 }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # Bước 6: Build Docker image và đặt tag
       - name: Build Docker image
-        run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME1 }}/flask-cicd-app:latest .
+        run: docker build -t ${{ secrets.DOCKER_USERNAME1 }}/flask-cicd-app:latest .
 
-      # Bước 7: Push image lên Docker Hub Registry
       - name: Push Docker image
-        run: |
-          docker push ${{ secrets.DOCKER_USERNAME1 }}/flask-cicd-app:latest
-
-  # --------------------------------------------------
-  # JOB 2: Deploy lên server (TẠM THỜI TẮT - chưa có VPS)
-  # Bỏ comment khi có server và thêm secrets:
-  #   SERVER_HOST, SERVER_USERNAME, SERVER_SSH_KEY
-  # --------------------------------------------------
-  # deploy:
-  #   needs: test-build
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Deploy to server
-  #       uses: appleboy/ssh-action@v1.0.3
-  #       with:
-  #         host: ${{ secrets.SERVER_HOST }}
-  #         username: ${{ secrets.SERVER_USERNAME }}
-  #         key: ${{ secrets.SERVER_SSH_KEY }}
-  #         script: |
-  #           docker pull ${{ secrets.DOCKER_USERNAME }}/flask-cicd-app:latest
-  #           docker stop flask-app || true
-  #           docker rm flask-app || true
-  #           docker run -d --name flask-app -p 80:5000 --restart always \
-  #             ${{ secrets.DOCKER_USERNAME }}/flask-cicd-app:latest
+        run: docker push ${{ secrets.DOCKER_USERNAME1 }}/flask-cicd-app:latest
